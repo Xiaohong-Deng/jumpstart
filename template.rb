@@ -27,24 +27,25 @@ end
 
 def add_gems
   gem 'administrate', '~> 0.10.0'
+  gem 'bootstrap', '~> 4.1'
   gem 'data-confirm-modal', '~> 1.6.2'
   gem 'devise', '~> 4.4.3'
   gem 'devise-bootstrapped', github: 'excid3/devise-bootstrapped', branch: 'bootstrap4'
   gem 'devise_masquerade', '~> 0.6.0'
-  gem 'font-awesome-sass', '~> 4.7'
+  gem 'font-awesome-rails', '~> 4.7'
+  gem 'foreman', '~> 0.84.0'
+  gem 'friendly_id', '~> 5.1.0'
   gem 'gravatar_image_tag', github: 'mdeering/gravatar_image_tag'
   gem 'jquery-rails', '~> 4.3.1'
-  gem 'bootstrap', '~> 4.0.0.beta'
   gem 'mini_magick', '~> 4.8'
-  gem 'webpacker', '~> 3.4'
   gem 'sidekiq', '~> 5.0'
-  gem 'foreman', '~> 0.84.0'
+  gem 'simple_form', '~> 4.0'
+  gem 'sitemap_generator', '~> 6.0', '>= 6.0.1'
   gem 'omniauth-facebook', '~> 4.0'
   gem 'omniauth-twitter', '~> 1.4'
   gem 'omniauth-github', '~> 1.3'
+  gem 'webpacker', '~> 3.4'
   gem 'whenever', require: false
-  gem 'friendly_id', '~> 5.1.0'
-  gem 'sitemap_generator', '~> 6.0', '>= 6.0.1'
 end
 
 def set_application_name
@@ -53,6 +54,10 @@ def set_application_name
 
   # Announce the user where he can change the application name in the future.
   puts "You can change application name inside: ./config/application.rb"
+end
+
+def add_simple_form
+  generate "simple_form:install --bootstrap"
 end
 
 def add_users
@@ -130,6 +135,10 @@ def add_sidekiq
 end
 
 def add_foreman
+  # by default the first arg is the absolute source path to the file
+  # and by default it is the root path of your app in Rails AppGenerator
+  # but in copy_path it stores source path as destination
+  # then look for the Procfile in source_paths, load it and copy it to the destination
   copy_file "Procfile"
 end
 
@@ -146,6 +155,7 @@ end
 def add_administrate
   generate "administrate:install"
 
+  # look for the file in your app's root path
   gsub_file "app/dashboards/announcement_dashboard.rb",
     /announcement_type: Field::String/,
     "announcement_type: Field::Select.with_options(collection: Announcement::TYPES)"
@@ -218,6 +228,7 @@ add_gems
 after_bundle do
   set_application_name
   stop_spring
+  add_simple_form
   add_users
   add_bootstrap
   add_sidekiq
@@ -227,7 +238,7 @@ after_bundle do
   add_notifications
   add_multiple_authentication
   add_friendly_id
-  
+
   copy_templates
 
   # Migrate
